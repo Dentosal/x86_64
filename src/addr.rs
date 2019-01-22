@@ -95,6 +95,14 @@ impl VirtAddr {
         VirtAddr(addr)
     }
 
+    /// Creates a new canonical virtual address without checks.
+    ///
+    /// Given address must be canonical, i.e. sign extented of from bit 47.
+    pub const unsafe fn new_unchecked_raw(addr: u64) -> VirtAddr {
+        VirtAddr(addr)
+    }
+
+
     /// Creates a virtual address that points to `0`.
     #[inline]
     pub const fn zero() -> VirtAddr {
@@ -136,6 +144,18 @@ impl VirtAddr {
     #[inline]
     pub const fn is_null(self) -> bool {
         self.0 == 0
+    }
+
+    /// Converts the address to a raw pointer.
+    #[cfg(target_pointer_width = "64")]
+    pub const unsafe fn as_ptr_unchecked<T>(self) -> *const T {
+        self.as_u64() as *const T
+    }
+
+    /// Converts the address to a mutable raw pointer.
+    #[cfg(target_pointer_width = "64")]
+    pub const unsafe fn as_mut_ptr_unchecked<T>(self) -> *mut T {
+        self.as_ptr_unchecked::<T>() as *mut T
     }
 
     /// Aligns the virtual address upwards to the given alignment.
@@ -332,6 +352,12 @@ impl PhysAddr {
     pub const fn zero() -> PhysAddr {
         PhysAddr(0)
     }
+    /// Creates a new physical address without checking validity.
+    ///
+    /// Bits through 52 to 64 must be clear.
+    pub const unsafe fn new_unchecked(addr: u64) -> PhysAddr {
+        PhysAddr(addr)
+    }
 
     /// Converts the address to an `u64`.
     #[inline]
@@ -343,6 +369,18 @@ impl PhysAddr {
     #[inline]
     pub const fn is_null(self) -> bool {
         self.0 == 0
+    }
+
+    /// Converts the address to a raw pointer.
+    #[cfg(target_pointer_width = "64")]
+    pub const fn as_ptr<T>(self) -> *const T {
+        self.as_u64() as *const T
+    }
+
+    /// Converts the address to a mutable raw pointer.
+    #[cfg(target_pointer_width = "64")]
+    pub const fn as_mut_ptr<T>(self) -> *mut T {
+        self.as_ptr::<T>() as *mut T
     }
 
     /// Aligns the physical address upwards to the given alignment.
