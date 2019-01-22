@@ -80,13 +80,21 @@ impl VirtAddr {
         VirtAddr(addr)
     }
 
+    /// Creates a new canonical virtual address without checks.
+    ///
+    /// Given address must be canonical, i.e. sign extented of from bit 47.
+    pub const unsafe fn new_unchecked_raw(addr: u64) -> VirtAddr {
+        VirtAddr(addr)
+    }
+
+
     /// Creates a virtual address that points to `0`.
     pub const fn zero() -> VirtAddr {
         VirtAddr(0)
     }
 
     /// Converts the address to an `u64`.
-    pub fn as_u64(self) -> u64 {
+    pub const fn as_u64(self) -> u64 {
         self.0
     }
 
@@ -99,15 +107,13 @@ impl VirtAddr {
 
     /// Converts the address to a raw pointer.
     #[cfg(target_pointer_width = "64")]
-    pub fn as_ptr<T>(self) -> *const T {
-        use usize_conversions::usize_from;
-
-        usize_from(self.as_u64()) as *const T
+    pub const fn as_ptr<T>(self) -> *const T {
+        self.as_u64() as *const T
     }
 
     /// Converts the address to a mutable raw pointer.
     #[cfg(target_pointer_width = "64")]
-    pub fn as_mut_ptr<T>(self) -> *mut T {
+    pub const fn as_mut_ptr<T>(self) -> *mut T {
         self.as_ptr::<T>() as *mut T
     }
 
@@ -271,14 +277,33 @@ impl PhysAddr {
         }
     }
 
+    /// Creates a new physical address without checking validity.
+    ///
+    /// Bits through 52 to 64 must be clear.
+    pub const unsafe fn new_unchecked(addr: u64) -> PhysAddr {
+        PhysAddr(addr)
+    }
+
     /// Converts the address to an `u64`.
-    pub fn as_u64(self) -> u64 {
+    pub const fn as_u64(self) -> u64 {
         self.0
     }
 
     /// Convenience method for checking if a physical address is null.
-    pub fn is_null(&self) -> bool {
+    pub const fn is_null(&self) -> bool {
         self.0 == 0
+    }
+
+    /// Converts the address to a raw pointer.
+    #[cfg(target_pointer_width = "64")]
+    pub const fn as_ptr<T>(self) -> *const T {
+        self.as_u64() as *const T
+    }
+
+    /// Converts the address to a mutable raw pointer.
+    #[cfg(target_pointer_width = "64")]
+    pub const fn as_mut_ptr<T>(self) -> *mut T {
+        self.as_ptr::<T>() as *mut T
     }
 
     /// Aligns the physical address upwards to the given alignment.
