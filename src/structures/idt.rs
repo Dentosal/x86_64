@@ -17,6 +17,9 @@ use core::marker::PhantomData;
 use core::ops::Bound::{Excluded, Included, Unbounded};
 use core::ops::{Deref, Index, IndexMut, RangeBounds};
 
+#[cfg(feature = "use-serde")]
+use serde::{Deserialize, Serialize};
+
 /// An Interrupt Descriptor Table with 256 entries.
 ///
 /// The first 32 entries are used for CPU exceptions. These entries can be either accessed through
@@ -714,6 +717,7 @@ impl EntryOptions {
 /// occurs, which can cause undefined behavior (see the [`as_mut`](InterruptStackFrame::as_mut)
 /// method for more information).
 #[repr(C)]
+#[cfg_attr(feature = "use-serde", derive(Serialize, Deserialize))]
 pub struct InterruptStackFrame {
     value: InterruptStackFrameValue,
 }
@@ -751,6 +755,7 @@ impl fmt::Debug for InterruptStackFrame {
 }
 
 /// Represents the interrupt stack frame pushed by the CPU on interrupt or exception entry.
+#[cfg_attr(feature = "use-serde", derive(Serialize, Deserialize))]
 #[derive(Clone)]
 #[repr(C)]
 pub struct InterruptStackFrameValue {
@@ -791,6 +796,7 @@ impl fmt::Debug for InterruptStackFrameValue {
 
 bitflags! {
     /// Describes an page fault error code.
+    #[cfg_attr(feature = "use-serde", derive(Serialize, Deserialize))]
     #[repr(transparent)]
     pub struct PageFaultErrorCode: u64 {
         /// If this flag is set, the page fault was caused by a page-protection violation,

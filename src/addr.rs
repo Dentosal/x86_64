@@ -6,6 +6,9 @@ use core::ops::{Add, AddAssign, Sub, SubAssign};
 use crate::structures::paging::{PageOffset, PageTableIndex};
 use bit_field::BitField;
 
+#[cfg(feature = "use-serde")]
+use serde::{Deserialize, Serialize};
+
 /// A canonical 64-bit virtual memory address.
 ///
 /// This is a wrapper type around an `u64`, so it is always 8 bytes, even when compiled
@@ -16,6 +19,7 @@ use bit_field::BitField;
 /// On `x86_64`, only the 48 lower bits of a virtual address can be used. The top 16 bits need
 /// to be copies of bit 47, i.e. the most significant bit. Addresses that fulfil this criterium
 /// are called “canonical”. This type guarantees that it always represents a canonical address.
+#[cfg_attr(feature = "use-serde", derive(Serialize, Deserialize))]
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 #[repr(transparent)]
 pub struct VirtAddr(u64);
@@ -29,6 +33,7 @@ pub struct VirtAddr(u64);
 ///
 /// On `x86_64`, only the 52 lower bits of a physical address can be used. The top 12 bits need
 /// to be zero. This type guarantees that it always represents a valid physical address.
+#[cfg_attr(feature = "use-serde", derive(Serialize, Deserialize))]
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 #[repr(transparent)]
 pub struct PhysAddr(u64);
@@ -101,7 +106,6 @@ impl VirtAddr {
     pub const unsafe fn new_unchecked_raw(addr: u64) -> VirtAddr {
         VirtAddr(addr)
     }
-
 
     /// Creates a virtual address that points to `0`.
     #[inline]

@@ -32,6 +32,12 @@ bitflags = "1.0.4"
 [build-dependencies]
 cc = { version = "1.0.37", optional = true }
 
+[dependencies.serde]            # Serde
+version = "1.0.102"
+default-features = false
+features = ["alloc", "derive"]
+optional = true
+
 [features]
 default = [ "nightly", "instructions" ]
 instructions = []
@@ -40,6 +46,7 @@ nightly = [ "inline_asm", "const_fn", "abi_x86_interrupt" ]
 inline_asm = []
 abi_x86_interrupt = []
 const_fn = []
+use-serde = ["serde"]
 
 [package.metadata.release]
 no-dev-version = true
